@@ -44,7 +44,7 @@ in
       enable = lib.mkOption {
         type = lib.types.bool;
         description = "Enable Mailhog";
-        default = true;
+        default = false;
       };
       host = lib.mkOption {
         type = lib.types.str;

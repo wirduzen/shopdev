@@ -7,7 +7,7 @@ in
     enable = lib.mkOption {
       type = lib.types.bool;
       description = ''Enable and configure RabbitMQ via shopdev.'';
-      default = true;
+      default = false;
     };
     host = lib.mkOption {
       type = lib.types.str;
