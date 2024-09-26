@@ -8,7 +8,7 @@ in
       enable = lib.mkOption {
         type = lib.types.bool;
         description = "Enable redis";
-        default = false;
+        default = true;
       };
       host = lib.mkOption {
         type = lib.types.str;

@@ -56,12 +56,12 @@ in
 
       shopdev-import-database.exec = ''
         echo "Importing database dump..."
-        echo -n "Enter path to database dump (myDatabase.sql)"
+        echo -n "Enter path to database dump (myDatabase.sql): "
         read DBPATH
         echo "Please confirm that this is the right database: $DBPATH"
-        echo "Write 'Yes, please import my DB' to confirm"
+        echo -n "Write 'Import': "
         read confirm
-        if [ $confirm = "Yes, please import my DB" ]
+        if [ $confirm = "Import" ]
         then
           echo "Confirmed, importing DB..."
           mysql -p ${cfg.database.username} ${cfg.database.password} ${cfg.database.name} < $DBPATH
