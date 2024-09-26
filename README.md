@@ -30,9 +30,9 @@ imports:
 inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
-	shopdev:
-		url: github:wirduzen/shopdev/test
-		flake: false
+  shopdev:
+    url: github:wirduzen/shopdev/test
+    flake: false
 ```
 
 ## for a new shop
@@ -41,7 +41,15 @@ inputs:
 
 # Configuration
 
-Once you've installed shopdev, you can start using it either by downloading one of the example configurations or just by adding `shopdev.enable = true;` to your `devenv.nix` and add other options from the documentation.
+Once you've installed shopdev, you can start using it either by downloading one of the example configurations or just by adding `shopdev.enable = true;` to your `devenv.nix` and adding other options from the documentation.
+
+After that you should open a shell (using `devenv shell`) and run `shopdev-init`. This will do some configuration for you:
+
+- adds caches to cachix: devenv, shopware, fossar
+- runs `composer install` and additional composer commands
+- allows you to import a database dump
+- generates jwt secret: Authentication for shopware api to validate plugin licences
+- runs build-js
 
 ## Example Configurations
 

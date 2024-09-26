@@ -18,7 +18,7 @@ in
     enable = lib.mkOption {
       type = lib.types.bool;
       description = "Enables ShopDev, a development environment for Shopware.";
-      # default = true; # no default, enable or disable it. Your choice.
+      default = false;
     };
     host = lib.mkOption {
       type = lib.types.str;

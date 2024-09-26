@@ -54,6 +54,23 @@ in
         echo "Password: shopware"
       '';
 
+      shopdev-import-database.exec = ''
+        echo "Importing database dump..."
+        echo -n "Enter path to database dump (myDatabase.sql)"
+        read DBPATH
+        echo "Please confirm that this is the right database: $DBPATH"
+        echo "Write 'Yes, please import my DB' to confirm"
+        read confirm
+        if [ $confirm = "Yes, please import my DB" ]
+        then
+          echo "Confirmed, importing DB..."
+          mysql -p ${cfg.database.username} ${cfg.database.password} ${cfg.database.name} < $DBPATH
+          echo "Imported DB"
+        else
+          echo "No confirmation, not importing DB"
+        fi
+      '';
+
       shopdev-init.exec = ''
         # Before installing devenv, instruct Cachix to use the devenv cache:
         cachix use devenv
@@ -70,21 +87,6 @@ in
         # require devenv
         echo "composer require devenv"
         composer require devenv
-
-        echo "Importing database dump..."
-        echo -n "Enter path to database dump (myDatabase.sql)"
-        read DBPATH
-        echo "Please confirm that this is the right database: $DBPATH"
-        echo "Write 'Yes, please import my DB' to confirm"
-        read confirm
-        if [ $confirm = "Yes, please import my DB" ]
-        then
-          echo "Confirmed, importing DB..."
-          mysql -p ${cfg.database.username} ${cfg.database.password} ${cfg.database.name} < $DBPATH
-          echo "Imported DB"
-        else
-          echo "No confirmation, not importing DB"
-        fi
 
         echo "generate jwt secret"
         bin/console system:generate-jwt-secret
