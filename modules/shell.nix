@@ -29,6 +29,11 @@ in
         echo "hello test from shell.nix"
       '';
 
+      createOptionsDocs.exec = ''
+        nix build -f modules/mkDocs.nix
+        cat result > ../docs/options.md
+      '';
+
       # see https://github.com/NixOS/nixpkgs/blob/nixos-24.05/nixos/modules/services/web-servers/nginx/default.nix
       # service definition: AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" "CAP_SYS_RESOURCE" ]
       allowPorts.exec = ''
