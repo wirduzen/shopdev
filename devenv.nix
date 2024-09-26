@@ -62,7 +62,7 @@ in
     env = {
       APP_ENV = "dev"; # set Shopware into dev mode. Will lead to error 500 if not set
       APP_URL = "https://${cfg.host}:${toString cfg.httpPort}"; # no idea
-      APP_SECRET = "devsecret";
+      #APP_SECRET = lib.mkDefault "devsecret";
       STOREFRONT_PROXY_URL = cfg.host;
       CYPRESS_baseUrl = "http://${cfg.host}:${toString cfg.httpPort}";
       SHOPWARE_CACHE_ID = "dev";

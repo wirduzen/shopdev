@@ -64,7 +64,7 @@ in
         if [ $confirm = "Import" ]
         then
           echo "Confirmed, importing DB..."
-          mysql -p ${cfg.database.username} ${cfg.database.password} ${cfg.database.name} < $DBPATH
+          mysql -u ${cfg.database.username} -p ${cfg.database.password} ${cfg.database.name} < $DBPATH
           echo "Imported DB"
         else
           echo "No confirmation, not importing DB"
@@ -72,6 +72,10 @@ in
       '';
 
       shopdev-init.exec = ''
+        echo "hello world"
+        echo "generate jwt secret"
+        bin/console system:generate-jwt-secret
+
         # Before installing devenv, instruct Cachix to use the devenv cache:
         cachix use devenv
         # Before booting up your development environment, configure Cachix to use Shopware's cache:
@@ -86,10 +90,7 @@ in
         echo "Installed composer."
         # require devenv
         echo "composer require devenv"
-        composer require devenv
-
-        echo "generate jwt secret"
-        bin/console system:generate-jwt-secret
+        #composer require devenv
 
         echo "build js"
         bin/build-js.sh

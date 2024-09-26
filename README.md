@@ -35,6 +35,8 @@ inputs:
     flake: false
 ```
 
+create install.lock file
+
 ## for a new shop
 
 ## as a flake input
