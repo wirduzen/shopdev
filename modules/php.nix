@@ -8,18 +8,18 @@ let
     extensions = { all, enabled }: with all; enabled
       ++ (lib.optional config.services.redis.enable redis)
       ++ (lib.optional config.services.blackfire.enable blackfire)
-      ++ (lib.optional config.services.rabbitmq.enable amqp);
-      #++ lib.attrsets.attrValues (lib.attrsets.getAttrs cfg.additionalPhpExtensions package.extensions);
-    extraConfig = lib.strings.concatLines cfg.php.config;
+      ++ (lib.optional config.services.rabbitmq.enable amqp)
+      ++ lib.attrsets.attrValues (lib.attrsets.getAttrs cfg.php.additionalExtensions package.extensions);
+    extraConfig = lib.strings.concatLines [ cfg.php.defaultConfig cfg.php.extraConfig ];
   };
 
   phpXdebugPackage = package.buildEnv {
     extensions = { all, enabled }: with all; enabled
       ++ [ xdebug grpc ]
       ++ (lib.optional config.services.redis.enable redis)
-      ++ (lib.optional config.services.rabbitmq.enable amqp);
-      #++ lib.attrsets.attrValues (lib.attrsets.getAttrs cfg.additionalPhpExtensions package.extensions);
-    extraConfig = lib.strings.concatLines cfg.php.config;
+      ++ (lib.optional config.services.rabbitmq.enable amqp)
+      ++ lib.attrsets.attrValues (lib.attrsets.getAttrs cfg.php.additionalExtensions package.extensions);
+    extraConfig = lib.strings.concatLines [ cfg.php.defaultConfig cfg.php.extraConfig ];
   };
 in
 {
@@ -32,83 +32,63 @@ in
       '';
       default = "php83";
     };
-    memoryLimit = lib.mkOption {
+    defaultConfig = lib.mkOption {
       type = lib.types.str;
       description = ''
-        Memory Limit for PHP
+        The default PHP settings. You can override these using shopdev.php.extraConfig.
+        The settings are passed to the custom PHP package instead of php.ini.
       '';
-      example = [
-        "8192M"
-        "6G"
-        "-1"
-      ];
-      default = "8192M";
+      default = ''
+        pdo_mysql.default_socket = ${builtins.toString cfg.database.port}
+        mysqli.default_socket = ${builtins.toString cfg.database.port}
+        memory_limit = 512M
+        realpath_cache_ttl = 3600
+        session.gc_probability = 0
+        display_errors = On
+        display_startup_errors = true
+        error_reporting = E_ALL
+        html_errors = true
+        max_execution_time = 60
+        max_input_time = 60
+        assert.active = 0
+        zend.detect_unicode = 0
+        opcache.memory_consumption = 256M
+        opcache.interned_strings_buffer = 20
+        opcache.enable_cli = 1
+        opcache.enable = 1
+        zend.assertions = 0
+        short_open_tag = 0
+        xdebug.mode = "debug"
+        xdebug.start_with_request = "trigger"
+        xdebug.discover_client_host = 1
+        xdebug.var_display_max_depth = -1
+        xdebug.var_display_max_data = -1
+        xdebug.var_display_max_children = -1
+      '';
     };
-    config = lib.mkOption {
+    extraConfig = lib.mkOption {
+      type = lib.types.str;
+      description = ''
+        Additional PHP settings. The settings here will override settings in shopdev.php.defaultConfig.
+      '';
+      default = "";
+      example = ''
+        memory_limit = 1024M
+      '';
+    };
+    additionalExtensions = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      description = ''PHP settings.'';
-      default = [
-        "pdo_mysql.default_socket = ${builtins.toString cfg.database.port}"
-        "mysqli.default_socket = ${builtins.toString cfg.database.port}"
-        "memoryLimit = ${cfg.php.memoryLimit}"
-        # "blackfire.agent_socket = "${config.services.blackfire.socket}";" # blackfire is not included in shopdev
-        ''
-          realpath_cache_ttl = 3600
-          session.gc_probability = 0
-          display_errors = On
-          display_startup_errors = true
-          error_reporting = E_ALL
-          html_errors = true
-          max_execution_time = 60
-          max_input_time = 60
-          assert.active = 0
-          zend.detect_unicode = 0
-          opcache.memory_consumption = 256M
-          opcache.interned_strings_buffer = 20
-          opcache.enable_cli = 1
-          opcache.enable = 1
-          zend.assertions = 0
-          short_open_tag = 0
-          xdebug.mode = "debug"
-          xdebug.start_with_request = "trigger"
-          xdebug.discover_client_host = 1
-          xdebug.var_display_max_depth = -1
-          xdebug.var_display_max_data = -1
-          xdebug.var_display_max_children = -1
-        ''
-      ];
+      description = "Additional PHP extensions";
+      default = [ ];
+      example = [ "mailparse" ];
     };
-#     maxExecutionTime = lib.mkOption {
-#       type = lib.types.int;
-#       description = '''';
-#       default = 2;
-#     };
-
-#     extraConfig = lib.mkOption {
-#       type = lib.types.str;
-#       description = "Additional php.ini configuration. This is passed to phpPackage = pkgs.php.buildEnv.extraConfig";
-#       default = "";
-#       example = ''
-#         memory_limit = 0
-#       '';
-#     };
   };
+
   config = lib.mkIf cfg.enable {
-    # what does this do?
-    # Example command to use Xdebug with CLI inside devenv shell
-    # export XDEBUG_MODE=debug XDEBUG_SESSION=1; export XDEBUG_CONFIG="idekey=PHPSTORM"; php bin/console theme:compile
-    scripts.debug.exec = ''
-      XDEBUG_SESSION=1 ${phpXdebugPackage}/bin/php "$@"
-    '';
     languages.php = {
       enable = true;
       package = phpPackage;
-      # ini = lib.strings.concatStrings cfg.php.config;
       fpm = {
-#         phpOptions = ''
-#           memory_limit = "${cfg.php.memoryLimit}"
-#         '';
-
         pools = {
           web = {
             phpPackage = phpPackage;
@@ -121,7 +101,6 @@ in
               "pm.max_spare_servers" = 10;
             };
           };
-
           xdebug = {
             phpPackage = phpXdebugPackage;
             settings = {
