@@ -64,7 +64,7 @@ in
         if [ $confirm = "Import" ]
         then
           echo "Confirmed, importing DB..."
-          mysql -u ${cfg.database.username} -p ${cfg.database.password} ${cfg.database.name} < $DBPATH
+          mysql -u ${cfg.database.username} -p${cfg.database.password} ${cfg.database.name} < $DBPATH
           echo "Imported DB"
         else
           echo "No confirmation, not importing DB"

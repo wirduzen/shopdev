@@ -49,6 +49,7 @@ in
   config = lib.mkIf cfg.enable {
     packages = [
       pkgs.jq
+      pkgs.gnused
       pkgs.gnupatch
     ];
 
