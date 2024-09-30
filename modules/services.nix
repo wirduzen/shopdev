@@ -67,6 +67,17 @@ in
         default = 1025;
       };
     };
+
+    blackfire = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        description = ''
+          Enable Blackfire for shopdev.
+          Other configuration can be done using the devenv blackfire module (see https://devenv.sh/supported-services/blackfire/)
+        '';
+        default = false;
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -86,6 +97,10 @@ in
       uiListenAddress = "${cfg.mailhog.host}:${toString cfg.mailhog.port}";
       apiListenAddress = "${cfg.mailhog.host}:${toString cfg.mailhog.apiPort}";
       smtpListenAddress = "${cfg.mailhog.host}:${toString cfg.mailhog.smtpPort}";
+    };
+
+    services.blackfire = lib.mkIf cfg.blackfire.enable {
+      enable = true;
     };
 
     env = lib.mkMerge [

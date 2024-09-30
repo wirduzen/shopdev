@@ -27,11 +27,6 @@ let
         ''}
         file_server
       }
-#       handle @fallbackMediaPaths {
-#         @notStatic not file
-#         redir @notStatic https://www.tapetenshop.de{path}
-#         file_server
-#       }
 
       handle_errors {
         respond "{err.status_code} {err.status_text}"
@@ -69,7 +64,7 @@ let
     vhostConfig
   ];
 
-  vhostDomains = lib.lists.unique [ cfg.host cfg.caddy.additionalServerAlias ];
+  vhostDomains = lib.lists.unique ([ cfg.host "localhost" "127.0.0.1" ] ++ cfg.caddy.additionalServerAlias);
 
   caddyHostConfig = (lib.mkMerge
     (lib.forEach vhostDomains (domain: {
@@ -87,9 +82,8 @@ in {
       type = lib.types.listOf lib.types.str;
       description = ''
         Additional server alias for caddy. Hostnames / IPs added here will be served by caddy.
-        Default is [ "127.0.0.1" ]. Caddy produces an error if "127.0.0.1" is not part of the host list.
       '';
-      default = [ "127.0.0.1" ];
+      default = [ ];
     };
 
     staticFilePaths = lib.mkOption {

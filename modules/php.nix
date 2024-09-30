@@ -38,33 +38,38 @@ in
         The default PHP settings. You can override these using shopdev.php.extraConfig.
         The settings are passed to the custom PHP package instead of php.ini.
       '';
-      default = ''
-        pdo_mysql.default_socket = ${builtins.toString cfg.database.port}
-        mysqli.default_socket = ${builtins.toString cfg.database.port}
-        memory_limit = 512M
-        realpath_cache_ttl = 3600
-        session.gc_probability = 0
-        display_errors = On
-        display_startup_errors = true
-        error_reporting = E_ALL
-        html_errors = true
-        max_execution_time = 60
-        max_input_time = 60
-        assert.active = 0
-        zend.detect_unicode = 0
-        opcache.memory_consumption = 256M
-        opcache.interned_strings_buffer = 20
-        opcache.enable_cli = 1
-        opcache.enable = 1
-        zend.assertions = 0
-        short_open_tag = 0
-        xdebug.mode = "debug"
-        xdebug.start_with_request = "trigger"
-        xdebug.discover_client_host = 1
-        xdebug.var_display_max_depth = -1
-        xdebug.var_display_max_data = -1
-        xdebug.var_display_max_children = -1
-      '';
+      default = lib.strings.concatStrings [
+        ''
+          pdo_mysql.default_socket = ${builtins.toString cfg.database.port}
+          mysqli.default_socket = ${builtins.toString cfg.database.port}
+          memory_limit = 512M
+          realpath_cache_ttl = 3600
+          session.gc_probability = 0
+          display_errors = On
+          display_startup_errors = true
+          error_reporting = E_ALL
+          html_errors = true
+          max_execution_time = 60
+          max_input_time = 60
+          assert.active = 0
+          zend.detect_unicode = 0
+          opcache.memory_consumption = 256M
+          opcache.interned_strings_buffer = 20
+          opcache.enable_cli = 1
+          opcache.enable = 1
+          zend.assertions = 0
+          short_open_tag = 0
+          xdebug.mode = "debug"
+          xdebug.start_with_request = "trigger"
+          xdebug.discover_client_host = 1
+          xdebug.var_display_max_depth = -1
+          xdebug.var_display_max_data = -1
+          xdebug.var_display_max_children = -1
+        ''
+        (lib.strings.optionalString cfg.blackfire.enable ''
+          blackfire.agent_socket = ${builtins.toString cfg.blackfire.socket}
+        '')
+      ];
     };
     extraConfig = lib.mkOption {
       type = lib.types.str;

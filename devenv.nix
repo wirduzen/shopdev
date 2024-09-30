@@ -24,15 +24,10 @@ in
       type = lib.types.str;
       description = ''
         This is the host that all services use (unless overridden via their specific host option).
-        Defaults to localhost.
+        Defaults to 127.0.0.1
         There is really no reason to ever change this.
       '';
-      default = "localhost";
-    };
-    domainName = lib.mkOption {
-      type = lib.types.str;
-      description = ''Domain name. Defaults to localhost'';
-      default = "localhost";
+      default = "127.0.0.1";
     };
     httpPort = lib.mkOption {
       type = lib.types.int;

@@ -39,12 +39,7 @@ in
       allowPorts.exec = ''
         echo "THIS IS NOT A GOOD SOLUTION AND HAS TO BE CHANGED ASAP!"
         echo "sudo sysctl -w net.ipv4.ip_unprivileged_port_start=0"
-        # sudo setcap CAP_NET_BIND_SERVICE=+eip ${pkgs.caddy}/bin/caddy
-        ${config.services.caddy.package}/bin/caddy help
-        # sudo setcap cap_net_bind_service=+ep /nix/store/gbclzdlimv1ijdczgrzbrmrq7vly3p49-caddy-2.7.6/bin/caddy
-        which ${config.services.caddy.package}/bin/caddy
         sudo sysctl net.ipv4.ip_unprivileged_port_start=80
-        # trust
       '';
 
       shopware-install.exec = ''
