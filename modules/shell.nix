@@ -3,21 +3,6 @@ let
   cfg = config.shopdev;
 in
 {
-  options.shopdev = {
-    composer = {
-      extraCommands = lib.mkOption {
-        type = lib.types.str;
-        description = ''
-          Additional commands to run before installing composer. This can be used to setup authentication for private repos.
-        '';
-        example = ''
-          composer config --global --auth myPrivateRepo.example.com myPackage mySecret
-        '';
-        default = "";
-      };
-    };
-  };
-
   config = lib.mkIf cfg.enable {
     enterShell = ''
       printf "\n\nHello world from ShopDev made by WIRDUZEN!\n\n"
@@ -67,7 +52,6 @@ in
       '';
 
       shopdev-init.exec = ''
-        echo "hello world"
         echo "generate jwt secret"
         bin/console system:generate-jwt-secret
 
@@ -78,14 +62,8 @@ in
         # use cachix cache for fossar php packages to avoid building those PHP packages yourself.
         cachix use fossar
 
-        echo "Running extra commands ..."
-        ${cfg.composer.extraCommands}
         echo "Running <composer install> ..."
         composer install
-        echo "Installed composer."
-        # require devenv
-        echo "composer require devenv"
-        #composer require devenv
 
         echo "build js"
         bin/build-js.sh
