@@ -52,8 +52,8 @@ in
       '';
 
       shopdev-init.exec = ''
-        echo "generate jwt secret"
-        bin/console system:generate-jwt-secret
+        # create install.lock so that shopware does not install itself again
+        touch install.lock
 
         # Before installing devenv, instruct Cachix to use the devenv cache:
         cachix use devenv
@@ -64,6 +64,9 @@ in
 
         echo "Running <composer install> ..."
         composer install
+
+        echo "generate jwt secret"
+        bin/console system:generate-jwt-secret
 
         echo "build js"
         bin/build-js.sh
