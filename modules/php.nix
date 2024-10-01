@@ -2,7 +2,7 @@
 let
   cfg = config.shopdev;
 
-  package = inputs.nix-phps.packages.${pkgs.stdenv.system}.${cfg.php.package};
+  package = inputs.nix-phps.packages.${pkgs.stdenv.system}.${cfg.php.version};
 
   phpPackage = package.buildEnv {
     extensions = { all, enabled }: with all; enabled
@@ -24,11 +24,11 @@ let
 in
 {
   options.shopdev.php = {
-    package = lib.mkOption {
+    version = lib.mkOption {
       type = lib.types.str;
       description = ''
-        Set the PHP Package to use.
-        Packages are provided by fossar/nix-phps, see https://github.com/fossar/nix-phps for all available versions.
+        Set the PHP Version to use.
+        Versions are provided by fossar/nix-phps, see https://github.com/fossar/nix-phps for all available versions.
       '';
       default = "php83";
     };
