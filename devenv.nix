@@ -48,11 +48,7 @@ in
       pkgs.gnupatch
     ];
 
-    # dotenv is weird and does not work; YES IT DOES!!!
-    # phpVersion = if builtins.hasAttr "PHP_VERSION" config.env then config.env.PHP_VERSION else cfg.phpVersion;
-    # echo "PHP Version from .env file: ${config.env.APP_ENV}"
-    # dotenv.disableHint = true;
-    dotenv.enable = true;
+    dotenv.disableHint = true;
 
     # Set Shopware environment variables
     env = {
