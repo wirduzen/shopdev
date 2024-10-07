@@ -31,12 +31,6 @@ in
       description = ''Database user password'';
       default = "shopware";
     };
-    # old import from kellerkinder
-    enableMysqlBinLog = lib.mkOption {
-      type = lib.types.bool;
-      description = ''Enables MySQL binary logs'';
-      default = false;
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -75,9 +69,6 @@ in
           port = cfg.database.port; # this does not work for some reason, we set env.MYSQL_TCP_PORT instead
           sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION";
           skip_log_bin = 1;
-        } // lib.mkIf (cfg.database.enableMysqlBinLog) {
-          log_bin_trust_function_creators = 1;
-          sync_binlog = 0;
         };
 
         # mysql binaries
