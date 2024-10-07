@@ -36,7 +36,6 @@ in
   config = lib.mkIf cfg.enable {
     env = {
       DATABASE_URL = "mysql://${cfg.database.username}:${cfg.database.password}@${cfg.database.host}:${toString cfg.database.port}/${cfg.database.name}"; # Used by Symfony
-      MYSQL_TCP_PORT = cfg.database.port;
       SQL_SET_DEFAULT_SESSION_VARIABLES = "0"; # Don't know what it does, Felix said to remove it
       # see kellerkinder doku: We're setting some environment variables as default. As example, we're setting SQL_SET_DEFAULT_SESSION_VARIABLES default to O, since we're having the shopware recommended configuration for the database.
     };
