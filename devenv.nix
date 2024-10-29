@@ -52,7 +52,6 @@ in
 
     # Set Shopware environment variables
     env = {
-      APP_ENV = "dev"; # set Shopware into dev mode. Will lead to error 500 if not set
       APP_URL = "https://${cfg.host}:${toString cfg.httpPort}"; # no idea
       #APP_SECRET = lib.mkDefault "devsecret";
       STOREFRONT_PROXY_URL = cfg.host;
