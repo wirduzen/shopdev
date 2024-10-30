@@ -3,4 +3,5 @@
   shopdev = {
     enable = true;
   };
+  process.manager.implementation = "honcho";
 }
