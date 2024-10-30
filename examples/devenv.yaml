@@ -1,0 +1,19 @@
+allowUnfree: true
+imports:
+    - shopdev
+inputs:
+    nixpkgs:
+        url: github:NixOS/nixpkgs/nixos-unstable
+    shopdev:
+        url: github:wirduzen/shopdev
+        flake: false
+    froshpkgs:
+        url: github:FriendsOfShopware/nur-packages
+        inputs:
+            nixpkgs:
+                follows: "nixpkgs"
+    nix-phps:
+        url: github:fossar/nix-phps
+        inputs:
+            nixpkgs:
+                follows: nixpkgs
