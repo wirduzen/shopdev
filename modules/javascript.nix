@@ -5,8 +5,8 @@ in
 {
   config = lib.mkIf cfg.enable {
     languages.javascript = {
-      enable = lib.mkDefault true;
-      package = lib.mkDefault pkgs.nodejs-18_x;
+      enable = true;
+      package = pkgs.nodejs-18_x;
     };
 
     env = {

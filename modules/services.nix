@@ -119,7 +119,6 @@ in
         SHOPWARE_REDIS_CACHE_HOST = cfg.redis.host;
         SHOPWARE_REDIS_CACHE_PORT = cfg.redis.port;
         SHOPWARE_REDIS_CACHE_ENABLED = "1";
-        # no idea what it does
         SHOPWARE_REDIS_CACHE_PREFIX = "dev";
       })
       # Mailhog Environment Variables

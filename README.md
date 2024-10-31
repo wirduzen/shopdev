@@ -9,43 +9,13 @@ A development environment for Shopware, made by WIRDUZEN.
 
 # Installation
 
-Depending on your usecase, there are some differences in the installation procedure.
+Go to the [examples](https://github.com/wirduzen/shopdev/tree/main/examples) folder and download the `.envrc`, `devenv.nix` and `devenv.yaml` file. All you have to do is drop them into your project folder and you can start the configuration.
 
-## for an existing shop 
+## Configuration
 
-Open a terminal in the shop folder and run `devenv init` to create the initial devenv structure. This will create a devenv.yaml, which should look something like this:
+Once you've installed shopdev, you can start the Shop by running `devenv up`.
 
-```devenv
-inputs:
-  nixpkgs:
-    url: github:cachix/devenv-nixpkgs/rolling
-```
-
-Now you have to add shopdev as an input to `devenv.yaml`:
-
-```devenv
-allowUnfree: true
-imports:
-  - shopdev
-inputs:
-  nixpkgs:
-    url: github:cachix/devenv-nixpkgs/rolling
-  shopdev:
-    url: github:wirduzen/shopdev/test
-    flake: false
-```
-
-create install.lock file
-
-## for a new shop
-
-## as a flake input
-
-# Configuration
-
-Once you've installed shopdev, you can start using it either by downloading one of the example configurations or just by adding `shopdev.enable = true;` to your `devenv.nix` and adding other options from the documentation.
-
-After that you should open a shell (using `devenv shell`) and run `shopdev-init`. This will do some configuration for you:
+For the Shop to fully work you also have to do the usual setup, like `composer install` and building the Frontend. You can do these steps manually or use the `shopdev-init` command provided by shopdev. Just open a `devenv shell` and run `shopdev-init` (Note that `devenv up` must be running in another terminal for this to work). This will do the following:
 
 - adds caches to cachix: devenv, shopware, fossar
 - runs `composer install` and additional composer commands
@@ -53,8 +23,8 @@ After that you should open a shell (using `devenv shell`) and run `shopdev-init`
 - generates jwt secret: Authentication for shopware api to validate plugin licences
 - runs build-js
 
-## Example Configurations
+# Options
 
-You can download one of the examples from https://github.com/wirduzen/shopdev/blob/main/examples/sw6_example.nix, or 
+For a full list of options, see the [Wiki page](https://github.com/wirduzen/shopdev/wiki/Options).
 
-Go to the Download the `sw6_example.nix` and open it. 
+Shopdev provides custom options to make the setup easier. These options combine multiple [devenv options](https://devenv.sh/reference/options/) together and also set environment variables required by Shopware depending on your config. Because shopdev options just set values for devenv options, you can override them using the `mkForce` syntax.

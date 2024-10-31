@@ -27,6 +27,10 @@ in
         sudo sysctl net.ipv4.ip_unprivileged_port_start=80
       '';
 
+      caddy-trust.exec = ''
+        ${config.services.caddy.package}/bin/caddy trust
+      '';
+
       shopware-install.exec = ''
         bin/console system:install --basic-setup --create-database --force
         echo "Shopware has been installed. Open http://localhost:8000/admin in your browser after the installation has finished. You should see the Shopware admin interface.The default credentials are:"

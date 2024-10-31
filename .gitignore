@@ -1,5 +1,7 @@
 .idea
 
+result
+
 # Devenv
 /.devenv*
 /devenv.lock
