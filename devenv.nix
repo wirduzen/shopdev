@@ -52,7 +52,7 @@ in
 
     # Set Shopware environment variables
     env = {
-      APP_URL = "https://${cfg.host}:${toString cfg.httpPort}"; # no idea
+      APP_URL = "http://${cfg.host}:${toString cfg.httpPort}";
       #APP_SECRET = lib.mkDefault "devsecret";
       STOREFRONT_PROXY_URL = cfg.host;
       CYPRESS_baseUrl = "http://${cfg.host}:${toString cfg.httpPort}";
