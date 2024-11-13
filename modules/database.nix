@@ -61,7 +61,7 @@ in
         };
       in {
         mysqld = {
-          group_concat_max_len = 32000;
+          group_concat_max_len = 320000;
           key_buffer_size = 16777216;
           max_allowed_packet = 134217728;
           table_open_cache = 1024;
