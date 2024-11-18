@@ -6,7 +6,7 @@ in
   config = lib.mkIf cfg.enable {
     enterShell = ''
       printf '\n\nHello World from ShopDev made by WIRDUZEN!\n'
-      printf 'If this is your first time running this shop, consider running "devenv-init" to finish the setup.\n'
+      printf 'If this is your first time running this shop, consider running "shopdev-init" to finish the setup.\n'
     '';
 
     scripts = {

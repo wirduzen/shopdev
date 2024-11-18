@@ -36,7 +36,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.rabbitmq.enable {
     assertions = [{
       assertion = ("${cfg.rabbitmq.host}" != "127.0.0.1");
       message = "127.0.0.1 can't be used as rabbitmq host because it can't set short node names. Use localhost instead.";
