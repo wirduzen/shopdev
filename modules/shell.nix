@@ -10,10 +10,6 @@ in
     '';
 
     scripts = {
-      test.exec = ''
-        echo "hello test from shell.nix"
-      '';
-
       createOptionsDocs.exec = ''
         nix build -f modules/mkDocs.nix
         cat result > ../docs/options.md
@@ -23,12 +19,10 @@ in
       # service definition: AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" "CAP_SYS_RESOURCE" ]
       allowPorts.exec = ''
         echo "THIS IS NOT A GOOD SOLUTION AND HAS TO BE CHANGED ASAP!"
-        echo "sudo sysctl -w net.ipv4.ip_unprivileged_port_start=0"
+        echo "sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80"
         sudo sysctl net.ipv4.ip_unprivileged_port_start=80
-      '';
-
-      caddy-trust.exec = ''
-        ${config.services.caddy.package}/bin/caddy trust
+        #echo "This will allow caddy to bind to port 80";
+        #sudo setcap CAP_NET_BIND_SERVICE=+eip ${config.services.caddy.package}/bin/caddy;
       '';
 
       shopware-install.exec = ''
@@ -42,10 +36,10 @@ in
         echo "Importing database dump..."
         echo -n "Enter path to database dump (myDatabase.sql): "
         read DBPATH
-        echo "Please confirm that this is the right database: $DBPATH"
-        echo -n "Write 'Import': "
+        echo "Please make sure that this is the right database: $DBPATH"
+        echo -n "Type 'CONFIRM' to start the import process: "
         read confirm
-        if [ $confirm = "Import" ]
+        if [ $confirm = "CONFIRM" ]
         then
           echo "Confirmed, importing DB..."
           mysql -u ${cfg.database.username} -p${cfg.database.password} ${cfg.database.name} < $DBPATH

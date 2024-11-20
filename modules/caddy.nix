@@ -1,82 +1,58 @@
 { pkgs, config, inputs, lib, ... }:
-
 let
   cfg = config.shopdev;
+  hostConfig = ''
+    @default {
+      not path ${cfg.caddy.staticFilePaths}
+      not expression header_regexp('xdebug', 'Cookie', 'XDEBUG_SESSION') || query({'XDEBUG_SESSION': '*'})
+    }
+    @debugger {
+      not path ${cfg.caddy.staticFilePaths}
+      expression header_regexp('xdebug', 'Cookie', 'XDEBUG_SESSION') || query({'XDEBUG_SESSION': '*'})
+    }
 
-  vhostConfig = lib.strings.concatStrings [
-    ''
-      @default {
-        not path ${cfg.caddy.staticFilePaths}
-        not expression header_regexp('xdebug', 'Cookie', 'XDEBUG_SESSION') || query({'XDEBUG_SESSION': '*'})
-      }
-      @debugger {
-        not path ${cfg.caddy.staticFilePaths}
-        expression header_regexp('xdebug', 'Cookie', 'XDEBUG_SESSION') || query({'XDEBUG_SESSION': '*'})
-      }
+    root * ./${cfg.caddy.documentRoot}
 
-      root * ${cfg.caddy.projectRoot}/${cfg.caddy.documentRoot}
+    @fallbackMediaPaths {
+      path ${cfg.caddy.fallbackMediaPaths}
+    }
 
-      @fallbackMediaPaths {
-        path ${cfg.caddy.fallbackMediaPaths}
-      }
+    handle @fallbackMediaPaths {
+      ${lib.strings.optionalString (cfg.caddy.fallbackMediaUrl != "") ''
+      @notStatic not file
+      redir @notStatic ${lib.strings.removeSuffix "/" cfg.caddy.fallbackMediaUrl}{path}
+      ''}
+      file_server
+    }
 
-      handle @fallbackMediaPaths {
-        ${lib.strings.optionalString (cfg.caddy.fallbackMediaUrl != "") ''
-        @notStatic not file
-        redir @notStatic ${lib.strings.removeSuffix "/" cfg.caddy.fallbackMediaUrl}{path}
-        ''}
-        file_server
-      }
+    handle_errors {
+      respond "{err.status_code} {err.status_text}"
+    }
 
-      handle_errors {
-        respond "{err.status_code} {err.status_text}"
-      }
-
-      handle {
-        php_fastcgi @default unix/${config.languages.php.fpm.pools.web.socket} {
-          index ${cfg.caddy.indexFile}
-          trusted_proxies private_ranges
-        }
-
-        php_fastcgi @debugger unix/${config.languages.php.fpm.pools.xdebug.socket} {
-          index ${cfg.caddy.indexFile}
-          trusted_proxies private_ranges
-        }
-
-        file_server
-
-        encode zstd gzip
+    handle {
+      php_fastcgi @default unix/${config.languages.php.fpm.pools.web.socket} {
+        index ${cfg.caddy.indexFile}
+        trusted_proxies private_ranges
       }
 
-      log {
-        output stderr
-        format console
-        level ERROR
+      php_fastcgi @debugger unix/${config.languages.php.fpm.pools.xdebug.socket} {
+        index ${cfg.caddy.indexFile}
+        trusted_proxies private_ranges
       }
-    ''
-    # cfg.additionalVhostConfig
-  ];
 
-  vhostConfigTls = lib.strings.concatStrings [
-    ''
-      tls internal
-    ''
-    vhostConfig
-  ];
+      file_server
 
-  vhostDomains = lib.lists.unique ([ cfg.host "localhost" "127.0.0.1" ] ++ cfg.caddy.additionalServerAlias);
+      encode zstd gzip
+    }
 
-  caddyHostConfig = (lib.mkMerge
-    (lib.forEach vhostDomains (domain: {
-      "http://${toString domain}:${toString cfg.httpPort}" = lib.mkDefault {
-        extraConfig = vhostConfig;
-      };
-      "https://${toString domain}:${toString cfg.httpsPort}" = lib.mkDefault {
-        extraConfig = vhostConfigTls;
-      };
-    }))
-  );
-in {
+    log {
+      output stderr
+      format console
+      level ERROR
+    }
+  '';
+in
+{
   options.shopdev.caddy = {
     additionalServerAlias = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -84,12 +60,6 @@ in {
         Additional server alias for caddy. Hostnames / IPs added here will be served by caddy.
       '';
       default = [ ];
-    };
-
-    staticFilePaths = lib.mkOption {
-      type = lib.types.str;
-      description = ''Sets the matcher paths to be "ignored" by caddy'';
-      default = "/theme/* /media/* /thumbnail/* /bundles/* /css/* /fonts/* /js/* /recovery/* /sitemap/*";
     };
 
     documentRoot = lib.mkOption {
@@ -104,11 +74,10 @@ in {
       default = "index.php";
     };
 
-    projectRoot = lib.mkOption {
+    staticFilePaths = lib.mkOption {
       type = lib.types.str;
-      description = "Root of the project as path from the file devenv.nix";
-      default = ".";
-      example = "project";
+      description = ''Sets the matcher paths to be "ignored" by caddy'';
+      default = "/theme/* /media/* /thumbnail/* /bundles/* /css/* /fonts/* /js/* /recovery/* /sitemap/*";
     };
 
     fallbackMediaUrl = lib.mkOption {
@@ -125,20 +94,37 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # Installs a certificate into local trust store(s)
-    scripts.caddy-trust.exec = ''
-      ${config.services.caddy.package}/bin/caddy trust
-    '';
     services.caddy = {
       enable = true;
-      # what is this config?
       config = ''
         {
+          # disables HTTP-to-HTTPS redirects because we need http for profiling
           auto_https disable_redirects
+          # disables install_trust because it needs additional packages that are not available.
           skip_install_trust
         }
       '';
-      virtualHosts = caddyHostConfig;
+      virtualHosts = {
+        # this is a redirect to localhost to prevent issues with the licence checker
+        "127.0.0.1".extraConfig = ''
+          redir http://localhost 301
+        '';
+        # localhost without https is needed for profiling
+        "localhost" = {
+          serverAliases = cfg.caddy.additionalServerAlias ++ [ "http://localhost" ];
+          extraConfig = hostConfig;
+        };
+        # https://localhost is the main host
+        "https://localhost" = {
+          serverAliases = cfg.caddy.additionalServerAlias;
+          extraConfig = lib.strings.concatStrings [
+            ''
+              tls internal
+            ''
+            hostConfig
+          ];
+        };
+      };
     };
   };
 }

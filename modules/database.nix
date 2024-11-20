@@ -6,8 +6,11 @@ in
   options.shopdev.database = {
     host = lib.mkOption {
       type = lib.types.str;
-      description = ''Database host.'';
-      default = cfg.host;
+      description = ''
+        Database host.
+        This is set to 127.0.0.1 by default because the MySQL service does not work with localhost.
+      '';
+      default = "127.0.0.1";
     };
     port = lib.mkOption {
       type = lib.types.int;
