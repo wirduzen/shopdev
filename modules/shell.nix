@@ -3,10 +3,20 @@ let
   cfg = config.shopdev;
 in
 {
+  options.shopdev = {
+    composer.authCommand = lib.mkOption {
+        type = lib.types.str;
+        description = ''
+          Enter a command that will be run by shopdev-createAuth.
+          The output will be piped into auth.json.
+        '';
+        default = "";
+      };
+  };
   config = lib.mkIf cfg.enable {
     enterShell = ''
       printf '\n\nHello World from ShopDev made by WIRDUZEN!\n'
-      printf 'If this is your first time running this shop, consider running "shopdev-init" to finish the setup.\n'
+      printf 'If this is your first time running this shop, consider running "shopdev-init" to finish the setup and "shopdev-createAuth" to create the auth.json from the configured command.\n'
     '';
 
     scripts = {
@@ -68,6 +78,17 @@ in
 
         echo "build js"
         bin/build-js.sh
+      '';
+
+      shopdev-createAuth.exec = ''
+        echo "Creating auth.json..."
+        json=$(${config.shopdev.composer.authCommand});
+        if [ -n "$json" ]; then
+          echo $json > auth.json;
+          echo "Created auth.json."
+        else
+          echo "No Content for auth.json provided. Make sure the shopdev.composer.authCommand produces the correct string."
+        fi
       '';
     };
   };
