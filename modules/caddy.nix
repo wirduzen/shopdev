@@ -106,12 +106,15 @@ in
       '';
       virtualHosts = {
         # this is a redirect to localhost to prevent issues with the licence checker
-        "127.0.0.1".extraConfig = ''
-          redir http://localhost 301
+        "https://127.0.0.1".extraConfig = ''
+          redir https://localhost{uri}
+        '';
+        "http://127.0.0.1".extraConfig = ''
+          redir http://localhost{uri}
         '';
         # localhost without https is needed for profiling
-        "localhost" = {
-          serverAliases = cfg.caddy.additionalServerAlias ++ [ "http://localhost" ];
+        "http://localhost" = {
+          serverAliases = cfg.caddy.additionalServerAlias;
           extraConfig = hostConfig;
         };
         # https://localhost is the main host
