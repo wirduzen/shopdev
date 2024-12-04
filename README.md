@@ -1,6 +1,6 @@
 # shopdev
 
-A development environment for Shopware, made by WIRDUZEN.
+A development environment for Shopware, made by WIRDUZEN. This project is inspired by [kellerkinders' devenv-shopware](https://github.com/kellerkinderDE/devenv-shopware).
 
 # Features
 
